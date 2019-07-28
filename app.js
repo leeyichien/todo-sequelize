@@ -2,7 +2,11 @@
 
 const express = require("express");
 const app = express();
-
+// 判別開發環境
+if (process.env.NODE_ENV !== "production") {
+  // 如果不是 production 模式
+  require("dotenv").config(); // 使用 dotenv 讀取 .env 檔案
+}
 const exphbs = require("express-handlebars");
 const bodyParser = require("body-parser");
 const methodOverride = require("method-override");
@@ -38,8 +42,18 @@ app.use((req, res, next) => {
   next();
 });
 
+// 登入後可以取得使用者的資訊方便我們在 view 裡面直接使用
+app.use((req, res, next) => {
+  res.locals.user = req.user;
+  res.locals.isAuthenticated = req.isAuthenticated(); // 辨識使用者是否已經登入的變數，讓 view 可以使用
+  next();
+});
+
 // 使用路由器
+app.use("/", require("./routes/home"));
 app.use("/users", require("./routes/user"));
+app.use("/todos", require("./routes/todo"));
+app.use("/auth", require("./routes/auths")); // 把 auth route 加進來
 
 // 設定 express port 3000
 app.listen(port, () => {
