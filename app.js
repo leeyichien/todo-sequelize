@@ -7,6 +7,11 @@ const exphbs = require("express-handlebars");
 const bodyParser = require("body-parser");
 const methodOverride = require("method-override");
 
+// 載入 model
+const db = require("./models");
+const Todo = db.Todo;
+const User = db.User;
+
 const port = 3000;
 
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
@@ -35,8 +40,13 @@ app.get("/users/register", (req, res) => {
 });
 // 註冊檢查
 app.post("/users/register", (req, res) => {
-  res.send("register");
+  User.create({
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password
+  }).then(user => res.redirect("/"));
 });
+
 // 登出
 app.get("/users/logout", (req, res) => {
   res.send("logout");
