@@ -26,6 +26,8 @@ app.set("view engine", "handlebars");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 
+const flash = require("connect-flash"); // 載入 connect-flash
+
 app.use(
   session({
     secret: "todo_sequelize",
@@ -46,6 +48,19 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   res.locals.user = req.user;
   res.locals.isAuthenticated = req.isAuthenticated(); // 辨識使用者是否已經登入的變數，讓 view 可以使用
+  next();
+});
+
+app.use(flash()); // 使用 Connect flash
+
+// 建立 local variables
+app.use((req, res, next) => {
+  res.locals.user = req.user;
+  res.locals.isAuthenticated = req.isAuthenticated(); // 辨識使用者是否已經登入的變數，讓 view 可以使用
+
+  // 新增兩個 flash message 變數
+  res.locals.success_msg = req.flash("success_msg");
+  res.locals.warning_msg = req.flash("warning_msg");
   next();
 });
 
